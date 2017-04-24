@@ -1,0 +1,22 @@
+load GCP.mat
+image_forward_points=[GCP_F(:,4) GCP_F(:,3)];
+image_nadir_points=[GCP_N(:,4) GCP_N(:,3)];
+image_backward_points=[GCP_B(:,4) GCP_B(:,3)];
+for i=1:length(image_forward_points(:,1))
+    [X,Y,Z] = BLH2XYZ( GCP_N(i,5),GCP_N(i,6),GCP_N(i,7));
+    control_points(i,:)=[X,Y,Z];
+end
+for i=1:length(image_forward_points(:,1))
+bw_u=423945+image_backward_points(i,1);
+bw_v=image_backward_points(i,2);
+nd_u=377108+image_nadir_points(i,1);
+nd_v=image_nadir_points(i,2);
+fw_u=330363+image_forward_points(i,1);
+fw_v=image_forward_points(i,2);
+X=tla_image_position(bw_u,bw_v,nd_u,nd_v,fw_u,fw_v);%????????????
+ground_point(i,:)=X;
+[u_nad,v_nad]=XYZ2UV(X(1),X(2),X(3),2);
+diff_nad(i,:)=[u_nad-377108-image_nadir_points(i,1) v_nad-image_nadir_points(i,2)];
+%[B,L,H]=XYZ_BLH(X(1),X(2),X(3));
+diff_control(i,:)=control_points(i,:)-ground_point(i,:);
+end
