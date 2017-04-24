@@ -1,0 +1,31 @@
+function X=tla_image_position(bw_u,bw_v,nd_u,nd_v,fw_u,fw_v)
+[nd_y,nd_W,nd_Xs,nd_Ys,nd_Zs]=nd_waifang(nd_u,nd_v);
+[bw_y,bw_W,bw_Xs,bw_Ys,bw_Zs]=bw_waifang(bw_u,bw_v);
+[fw_y,fw_W,fw_Xs,fw_Ys,fw_Zs]=fw_waifang(fw_u,fw_v);
+f1=0.717180;
+f2=0.649905;
+f3=0.717255;
+nd_imagespace=[0,nd_y,f2]';
+bw_imagespace=[0,bw_y,f1]';
+fw_imagespace=[0,fw_y,f3]';
+nd_shixian_vector=nd_W*nd_imagespace;
+bw_shixian_vector=bw_W*bw_imagespace;
+fw_shixian_vector=fw_W*fw_imagespace;
+u1x=bw_shixian_vector(1);
+u1y=bw_shixian_vector(2);
+u1z=bw_shixian_vector(3);
+u2x=nd_shixian_vector(1);
+u2y=nd_shixian_vector(2);
+u2z=nd_shixian_vector(3);
+u3x=fw_shixian_vector(1);
+u3y=fw_shixian_vector(2);
+u3z=fw_shixian_vector(3);
+A=[u1z 0 -u1x;0 u1z -u1y;u2z 0 -u2x;0 u2z -u2y;u3z 0 -u3x;0 u3z -u3y];
+K=[u1z*bw_Xs-u1x*bw_Zs
+    u1z*bw_Ys-u1y*bw_Zs
+    u2z*nd_Xs-u2x*nd_Zs
+    u2z*nd_Ys-u2y*nd_Zs
+    u3z*fw_Xs-u3x*fw_Zs
+    u3z*fw_Ys-u3y*fw_Zs];
+X=(A'*A)^-1*A'*K;
+end
