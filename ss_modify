@@ -1,0 +1,123 @@
+ [attitude1,attitude2,attitude3]=att_process();
+   attitude1modify(:,1)=attitude1(:,1);
+   attitude2modify(:,1)=attitude1(:,1);
+   attitude3modify(:,1)=attitude1(:,1);
+   anzhi_str2cam=[0.235806791780133         0.834097889533183        -0.498674215467591
+     0.939162117573613        -0.327467332594395         -0.10363287026977
+    -0.24973950429588        -0.443898502496165        -0.860572120477672];
+   anzhi_str1cam=[0.472406634607485        0.24907334861511         0.845460568027244
+    -0.591006449662901        -0.622119355177139      0.513505572645733
+     0.653871811575796        -0.742249456140486     -0.146688264593522];
+   anzhi_str3cam=[ -0.471114410489738        -0.246686867548309     -0.846875463987908
+     0.180707142515781         0.912741674692874     -0.36639998523457
+     0.863363740458248         -0.32565226131637     -0.385426812950493];
+ 
+   for i=1:length(attitude1(:,1))
+        qua1=[attitude1(i,2),attitude1(i,3),attitude1(i,4),attitude1(i,5)];
+        attitude_matrix1=qua2rollpitchyaw_new(qua1);
+        L1Eci=attitude_matrix1(:,3);
+        
+        qua2=[attitude2(i,2),attitude2(i,3),attitude2(i,4),attitude2(i,5)];
+        attitude_matrix2=qua2rollpitchyaw_new(qua2);
+        L2Eci=attitude_matrix2(:,3);
+        
+        L1Body=anzhi_str1cam(3,:)';
+        L2Body=anzhi_str2cam(3,:)';
+        
+        
+        LcEci=cross(L1Eci,L2Eci);
+        LcBody=cross(L1Body,L2Body);
+        
+        TaBody1Eci=attitude_matrix1*anzhi_str1cam;
+        
+        LcEcia=TaBody1Eci*LcBody;
+        
+        theta=acos(dot(LcEci,LcEcia)/(norm(LcEci)*norm(LcEcia)));
+        p=cross(LcEci,LcEcia)/norm(cross(LcEci,LcEcia));
+        if(dot(LcEci,LcEcia)<=0)
+            p=-p;
+        end
+        qsigma=[cos(-theta/2),p(1)*sin(-theta/2),p(2)*sin(-theta/2),p(3)*sin(-theta/2)]';
+        Tsigma=qua2rollpitchyaw_new(qsigma);
+        TaBody1EciModify=Tsigma*TaBody1Eci;
+        QModify=rotatemat2quat(TaBody1EciModify,1);
+        attitude1modify(i,2:5)=QModify;
+   end
+   
+  for i=1:length(attitude1(:,1))
+        qua2=[attitude2(i,2),attitude2(i,3),attitude2(i,4),attitude2(i,5)];
+        attitude_matrix2=qua2rollpitchyaw_new(qua2);
+        L2Eci=attitude_matrix2(:,3);
+        
+        qua3=[attitude3(i,2),attitude3(i,3),attitude3(i,4),attitude3(i,5)];
+        attitude_matrix3=qua2rollpitchyaw_new(qua3);
+        L3Eci=attitude_matrix3(:,3);
+        
+        L2Body=anzhi_str2cam(3,:)';
+        L3Body=anzhi_str3cam(3,:)';
+        
+        
+        LcEci=cross(L2Eci,L3Eci);
+        LcBody=cross(L2Body,L3Body);
+        
+        TaBody2Eci=attitude_matrix2*anzhi_str2cam;
+        
+        LcEcia=TaBody2Eci*LcBody;
+        
+        theta=acos(dot(LcEci,LcEcia)/(norm(LcEci)*norm(LcEcia)));
+        p=cross(LcEci,LcEcia)/norm(cross(LcEci,LcEcia));
+        if(dot(LcEci,LcEcia)<=0)
+            p=-p;
+        end
+        qsigma=[cos(-theta/2),p(1)*sin(-theta/2),p(2)*sin(-theta/2),p(3)*sin(-theta/2)]';
+        Tsigma=qua2rollpitchyaw_new(qsigma);
+        TaBody2EciModify=Tsigma*TaBody2Eci;
+        QModify=rotatemat2quat(TaBody2EciModify,1);
+        attitude2modify(i,2:5)=QModify;
+  end
+   
+  for i=1:length(attitude1(:,1))
+        qua1=[attitude1(i,2),attitude1(i,3),attitude1(i,4),attitude1(i,5)];
+        attitude_matrix1=qua2rollpitchyaw_new(qua1);
+        L1Eci=attitude_matrix1(:,3);
+        
+        qua3=[attitude3(i,2),attitude3(i,3),attitude3(i,4),attitude3(i,5)];
+        attitude_matrix3=qua2rollpitchyaw_new(qua3);
+        L3Eci=attitude_matrix3(:,3);
+        
+        L1Body=anzhi_str1cam(3,:)';
+        L3Body=anzhi_str3cam(3,:)';
+        
+        
+        LcEci=cross(L1Eci,L3Eci);
+        LcBody=cross(L1Body,L3Body);
+        
+        TaBody3Eci=attitude_matrix3*anzhi_str3cam;
+        
+        LcEcia=TaBody3Eci*LcBody;
+        
+        theta=acos(dot(LcEci,LcEcia)/(norm(LcEci)*norm(LcEcia)));
+        p=cross(LcEci,LcEcia)/norm(cross(LcEci,LcEcia));
+        if(dot(LcEci,LcEcia)<=0)
+            p=-p;
+        end
+        qsigma=[cos(-theta/2),p(1)*sin(-theta/2),p(2)*sin(-theta/2),p(3)*sin(-theta/2)]';
+        Tsigma=qua2rollpitchyaw_new(qsigma);
+        TaBody3EciModify=Tsigma*TaBody3Eci;
+        QModify=rotatemat2quat(TaBody3EciModify,1);
+        attitude3modify(i,2:5)=QModify;
+  end
+  
+attitude1modify(:,2)=-attitude1modify(:,2);
+attitude2modify(:,2)=-attitude2modify(:,2);
+attitude3modify(:,2)=-abs(attitude3modify(:,2));
+attitude3modify(:,3)=-abs(attitude3modify(:,3));
+attitude3modify(:,4)=abs(attitude3modify(:,4));
+attitude3modify(:,5)=abs(attitude3modify(:,5));
+
+attitude=(attitude1modify*0+attitude2modify*0+attitude3modify*1)/1;
+fid=fopen('/Users/c_c/Desktop/Xhat.txt','w');
+for i=1:length(attitude(:,1))
+fprintf(fid,'%.8f %.20f %.20f %.20f %.20f\n',attitude(i,1),...
+attitude(i,2),attitude(i,3),attitude(i,4),attitude(i,5));
+end
